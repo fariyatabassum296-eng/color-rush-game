@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Color Rush</title>
+<style>
+*{box-sizing:border-box}body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:18px;background:linear-gradient(145deg,#10152b,#252d50);font-family:system-ui,sans-serif;color:#fff}
+main{width:min(100%,440px);background:#fff;color:#20243a;border-radius:24px;padding:22px;box-shadow:0 18px 55px #0005}
+h1{text-align:center;margin:0 0 6px;font-size:30px}.intro{text-align:center;color:#656b80;margin:0 0 20px;font-size:14px}
+.stats{display:flex;gap:9px;margin-bottom:18px}.stat{flex:1;background:#f1f3fb;border-radius:14px;text-align:center;padding:10px 4px}.stat span{display:block;color:#666d82;font-size:12px}.stat strong{font-size:23px}
+#word{height:125px;display:flex;align-items:center;justify-content:center;font-size:48px;font-weight:900;margin-bottom:10px}
+#status{text-align:center;min-height:42px;color:#626a80;font-size:14px}
+.colors{display:grid;grid-template-columns:1fr 1fr;gap:10px}.pick{border:0;border-radius:13px;min-height:56px;color:white;font-size:17px;font-weight:800;cursor:pointer}.pick:active,#start:active{transform:scale(.98)}
+#start{width:100%;margin-top:15px;padding:15px;border:0;border-radius:13px;background:#5b4be8;color:#fff;font-size:16px;font-weight:800;cursor:pointer}
+.note{text-align:center;color:#777d90;font-size:12px;margin:14px 0 0}
+</style>
+</head>
+<body>
+<main>
+<h1>🎮 Color Rush</h1><p class="intro">শব্দের নাম নয়—শব্দটি যে রঙে দেখা যাচ্ছে, সেই রং বেছে নিন!</p>
+<div class="stats"><div class="stat"><span>স্কোর</span><strong id="score">0</strong></div><div class="stat"><span>সময়</span><strong id="time">30</strong></div><div class="stat"><span>সেরা স্কোর</span><strong id="best">0</strong></div></div>
+<div id="word">প্রস্তুত?</div><div id="status">শুরু চাপুন, তারপর সঠিক রং বেছে নিন।</div>
+<div class="colors">
+<button class="pick" data-color="লাল" style="background:#e53935">লাল</button>
+<button class="pick" data-color="নীল" style="background:#2674e8">নীল</button>
+<button class="pick" data-color="সবুজ" style="background:#159447">সবুজ</button>
+<button class="pick" data-color="হলুদ" style="background:#d9a400;color:#222">হলুদ</button>
+</div>
+<button id="start">খেলা শুরু করুন</button><p class="note">৩০ সেকেন্ডে যত বেশি সঠিক উত্তর, তত বেশি পয়েন্ট!</p>
+</main>
+<script>
+const colors=[{name:'লাল',hex:'#e53935'},{name:'নীল',hex:'#2674e8'},{name:'সবুজ',hex:'#159447'},{name:'হলুদ',hex:'#d9a400'}];
+const word=document.querySelector('#word'),scoreEl=document.querySelector('#score'),timeEl=document.querySelector('#time'),bestEl=document.querySelector('#best'),statusEl=document.querySelector('#status'),start=document.querySelector('#start');
+let score=0,time=30,answer='',active=false,timer=null,best=Number(localStorage.getItem('colorRushBest')||0);bestEl.textContent=best;
+function next(){const text=colors[Math.floor(Math.random()*colors.length)],ink=colors[Math.floor(Math.random()*colors.length)];word.textContent=text.name;word.style.color=ink.hex;answer=ink.name}
+function end(){active=false;clearInterval(timer);word.style.color='#20243a';word.textContent='সময় শেষ!';statusEl.textContent='আপনার স্কোর '+score+'। আবার খেলবেন?';start.disabled=false;start.textContent='আবার খেলুন';if(score>best){best=score;bestEl.textContent=best;localStorage.setItem('colorRushBest',best)}}
+function begin(){clearInterval(timer);score=0;time=30;active=true;scoreEl.textContent=0;timeEl.textContent=30;statusEl.textContent='লেখাটি কোন রঙে দেখা যাচ্ছে?';start.disabled=true;start.textContent='খেলা চলছে…';next();timer=setInterval(()=>{time--;timeEl.textContent=time;if(time<=0)end()},1000)}
+document.querySelectorAll('.pick').forEach(btn=>btn.addEventListener('click',()=>{if(!active)return;if(btn.dataset.color===answer){score++;scoreEl.textContent=score;statusEl.textContent='সঠিক! +১ পয়েন্ট 🎉'}else statusEl.textContent='ভুল হয়েছে—আবার চেষ্টা করুন!';next()}));
+start.addEventListener('click',begin);
+</script>
+</body></html>
